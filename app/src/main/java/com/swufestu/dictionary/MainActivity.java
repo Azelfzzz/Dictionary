@@ -10,9 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -61,13 +63,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Log.i(TAG, "handleMessage: listItems"+listItems);
 
         SimpleAdapter listAdapter = new SimpleAdapter(
-                MainActivity.this,
+               MainActivity.this,
                 listItems,
                 R.layout.list_item,
                 new String[]{"word"},
                 new int[]{R.id.wordpaper});
         list.setAdapter(listAdapter);
+
         list.setOnItemClickListener(this);
+        searchView = findViewById(R.id.searchview);
+        searchView.setIconifiedByDefault(false);
+        //设置该SearchView显示搜索按钮
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setQueryHint("查找");
+        //为该SearchView组件设置事件监听器
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            //单机搜索按钮时激发该方法
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //实际应用中应该在该方法内执行实际查询，此处仅使用Toast显示用户输入的查询内容
+                Toast.makeText(MainActivity.this, "你的选择是：" + query,
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            //用户输入字符时激发该方法
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!TextUtils.isEmpty(newText)) {
+//              mListView.setFilterText(newText);
+                    listAdapter.getFilter().filter(newText);
+                } else {
+                    list.clearTextFilter();
+                }
+                return true;
+            }
+        });
     }
 
     //按照文件名，读取assets文件夹内的文件
