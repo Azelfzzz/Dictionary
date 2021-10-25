@@ -71,11 +71,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         list.setAdapter(listAdapter);
 
         list.setOnItemClickListener(this);
+
+        //设置查找
         searchView = findViewById(R.id.searchview);
         searchView.setIconifiedByDefault(false);
         //设置该SearchView显示搜索按钮
         searchView.setSubmitButtonEnabled(true);
-        searchView.setQueryHint("查找");
         //为该SearchView组件设置事件监听器
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             //单机搜索按钮时激发该方法
@@ -91,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (!TextUtils.isEmpty(newText)) {
-//              mListView.setFilterText(newText);
                     listAdapter.getFilter().filter(newText);
                 } else {
                     list.clearTextFilter();
