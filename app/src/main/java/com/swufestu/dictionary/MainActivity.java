@@ -11,12 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,11 +30,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ListView list;
     SearchView searchView;
+    SimpleAdapter listAdapter;
     ArrayList<HashMap<String,String>> listItems = new ArrayList<HashMap<String,String>>();
+    private HashMap<String, String> listtest;
 
 
     private static final String TAG = "onCreate";
@@ -62,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         Log.i(TAG, "handleMessage: listItems"+listItems);
 
-        SimpleAdapter listAdapter = new SimpleAdapter(
+        listAdapter = new SimpleAdapter(
                MainActivity.this,
                 listItems,
                 R.layout.list_item,
@@ -92,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (!TextUtils.isEmpty(newText)) {
-                    listAdapter.getFilter().filter(newText);
+                    Object[] obj = searchItem(newText);
+                    updateLayout(obj);
                 } else {
                     list.clearTextFilter();
                 }
@@ -137,6 +144,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         config.putExtras(bdl);
         startActivityForResult(config,1);
 
+    }
+
+    public Object[] searchItem(String name) {
+        ArrayList<String> mSearchList = new ArrayList<String>();
+        for (int i = 0; i < listItems.size(); i++) {
+            int index = listItems.get(i).get("word").indexOf(name);
+            // 存在匹配的数据
+            if (index != -1) {
+                mSearchList.add(listItems.get(i).get("word"));
+            }
+        }
+        return mSearchList.toArray();
+    }
+
+    public void updateLayout(Object[] obj) {
+        list.setAdapter(new ArrayAdapter<Object>(getApplicationContext(),
+                android.R.layout.simple_expandable_list_item_1, obj));
     }
 
 }
